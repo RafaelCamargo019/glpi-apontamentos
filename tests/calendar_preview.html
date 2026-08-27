@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prévia do calendário de apontamentos</title>
+  <link rel="stylesheet" href="../css/calendar.css">
+  <style>
+    :root { --tblr-bg-surface:#fff; --tblr-bg-surface-secondary:#f6f8fb; --tblr-border-color:#dce1e7; --tblr-secondary:#626976; --tblr-primary:#206bc4; }
+    body { margin:0; background:#eef1f5; color:#182433; font:14px Arial,sans-serif; }
+    .card { border:1px solid #dce1e7; border-radius:6px; }
+    .btn { padding:.45rem .7rem; border:1px solid #c8ced6; background:#fff; color:#182433; cursor:pointer; }
+    .btn-group .btn + .btn { margin-left:-1px; }
+    .btn.active,.btn-primary { color:#fff; background:#206bc4; border-color:#206bc4; }
+    .form-select { padding:.4rem; border:1px solid #c8ced6; border-radius:4px; }
+    [hidden] { display:none!important; }
+  </style>
+</head>
+<body>
+<div id="apontamentos-calendar" class="ap-calendar card" data-endpoint="/mock-events" data-form-url="#novo" data-can-create="1" data-can-manage-others="1" data-current-user="2" data-active-entity="0">
+  <div class="ap-toolbar">
+    <div class="ap-nav btn-group"><button class="btn" data-action="prev">‹</button><button class="btn" data-action="next">›</button><button class="btn" data-action="today">Hoje</button></div>
+    <h2 class="ap-title"></h2>
+    <div class="ap-views btn-group"><button class="btn" data-view="month">Mês</button><button class="btn" data-view="week">Semana</button><button class="btn" data-view="day">Dia</button><button class="btn" data-action="refresh">↻</button></div>
+  </div>
+  <div class="ap-filters"><div><label for="ap-user-filter">Usuário</label><select id="ap-user-filter" name="ap_user_filter" class="form-select"><option value="2">glpi</option></select></div><a class="btn btn-primary ap-new" href="#novo">+ Novo apontamento</a><a class="btn" href="#relatorio">📄 Relatório / Exportar</a></div>
+  <div class="ap-loading">Carregando apontamentos…</div><div class="ap-error" hidden></div><div class="ap-calendar-body"></div>
+  <div class="ap-period-total"><span>Total do período</span><strong>0h 00m</strong></div>
+</div>
+<script>
+  const today = new Date();
+  const pad = value => String(value).padStart(2, '0');
+  const stamp = (offset, hour, minute = 0) => { const date = new Date(today); date.setDate(date.getDate() + offset); return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())} ${pad(hour)}:${pad(minute)}:00`; };
+  const mockEvents = [
+    {id:1,user_id:2,entity_id:1,entity:'Matriz',start:stamp(0,8,30),end:stamp(0,10),content:'',reference:'Chamado #42',color:'#206BC4',url:'#1'},
+    {id:2,user_id:2,entity_id:2,entity:'Filial',start:stamp(1,10),end:stamp(1,12,30),content:'Implantação do projeto',reference:'',color:'#F59F00',url:'#2'},
+    {id:3,user_id:2,entity_id:1,entity:'Matriz',start:stamp(2,14),end:stamp(2,15),content:'Reunião',reference:'',color:'#206BC4',url:'#3'}
+  ];
+  const schedule = {
+    [stamp(0,0).slice(0,10)]: {expected_minutes:480,actual_minutes:90,state:'short',difference_minutes:-390},
+    [stamp(-1,0).slice(0,10)]: {expected_minutes:480,actual_minutes:480,state:'met',difference_minutes:0}
+  };
+  window.fetch = async () => ({ok:true,json:async()=>({events:mockEvents,schedule})});
+</script>
+<script src="../js/calendar.js"></script>
+</body>
+</html>
